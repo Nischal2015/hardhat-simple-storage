@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@nomiclabs/hardhat-etherscan";
 import "dotenv/config";
 
 const config: HardhatUserConfig = {
@@ -10,6 +11,9 @@ const config: HardhatUserConfig = {
             accounts: [process.env.PRIVATE_KEY!],
             chainId: 5,
         },
+    },
+    etherscan: {
+        apiKey: process.env.ETHERSCAN_API_KEY,
     },
     solidity: "0.8.17",
 };

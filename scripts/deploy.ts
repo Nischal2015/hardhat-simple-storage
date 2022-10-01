@@ -1,5 +1,5 @@
 // import
-import { ethers } from "hardhat";
+import { ethers, run, network } from "hardhat";
 
 // async main
 async function main() {
@@ -12,6 +12,30 @@ async function main() {
     await simpleStorage.deployed();
 
     console.log(`Deployed contract to: ${simpleStorage.address}`);
+    if (network.config.chainId === 5 && process.env.ETHERSCAN_API_KEY) {
+        await simpleStorage.deployTransaction.wait(6);
+        await verify(simpleStorage.address, []);
+    }
+}
+
+// verify
+async function verify(contractAddress: string, args: unknown) {
+    console.log("Verifying contract...");
+    try {
+        await run("verify:verify", {
+            address: contractAddress,
+            constructorArguments: args,
+        });
+    } catch (error) {
+        if (
+            error instanceof Error &&
+            error.message.includes("Reason: Already Verified")
+        ) {
+            console.log("Already verified");
+        } else {
+            console.log(error);
+        }
+    }
 }
 
 // main function caller
