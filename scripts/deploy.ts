@@ -3,6 +3,7 @@ import { ethers, run, network } from "hardhat";
 
 // async main
 async function main() {
+    // Deploy contract
     const simpleStorageFactory = await ethers.getContractFactory(
         "SimpleStorage"
     );
@@ -11,11 +12,21 @@ async function main() {
     const simpleStorage = await simpleStorageFactory.deploy();
     await simpleStorage.deployed();
 
+    // Verify logic
     console.log(`Deployed contract to: ${simpleStorage.address}`);
     if (network.config.chainId === 5 && process.env.ETHERSCAN_API_KEY) {
         await simpleStorage.deployTransaction.wait(6);
         await verify(simpleStorage.address, []);
     }
+
+    const currentValue = await simpleStorage.retrieve();
+    console.log(`Current value is: ${currentValue}`);
+
+    // update the favorite number
+    const transactionResponse = await simpleStorage.store(3456);
+    await transactionResponse.wait(1);
+    const updatedCurrentValue = await simpleStorage.retrieve();
+    console.log(`Updated value is: ${updatedCurrentValue}`);
 }
 
 // verify
